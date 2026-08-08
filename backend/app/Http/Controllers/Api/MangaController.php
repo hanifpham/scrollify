@@ -1,0 +1,212 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PopularRequest;
+use App\Http\Requests\RecommendationsRequest;
+use App\Http\Requests\UpdatesRequest;
+use App\Models\MangaView;
+use App\Models\ScanlatorMapping;
+use App\Services\MangaDex\DTOs\MangaSummary;
+use App\Services\MangaDex\MangaDexCacheService;
+use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+
+class MangaController extends Controller
+{
+    public function __construct(
+        protected MangaDexCacheService $mangaDex
+    ) {}
+
+    /**
+     * GET /api/manga/recommendations
+     * Query: format (manga|manhwa|manhua, required), limit (default 5)
+     * Response: { "data": MangaSummary[] }
+     */
+    public function recommendations(RecommendationsRequest $request): JsonResponse
+    {
+        $format = $request->validated('format');
+        $limit = (int) $request->validated('limit', 5);
+
+        $languages = match ($format) {
+            'manga' => ['ja'],
+            'manhwa' => ['ko'],
+            'manhua' => ['zh', 'zh-hk'],
+            default => ['ja'],
+        };
+
+        $response = $this->mangaDex->searchManga([
+            'originalLanguage' => $languages,
+            'limit' => $limit,
+            'order' => ['rating' => 'desc', 'followedCount' => 'desc'],
+            'includes' => ['cover_art', 'author', 'artist'],
+            'contentRating' => ['safe', 'suggestive'],
+            'hasAvailableChapters' => 'true',
+        ]);
+
+        $items = $response['data'] ?? [];
+        $mangaIds = array_column($items, 'id');
+
+        $stats = ! empty($mangaIds)
+            ? ($this->mangaDex->getMangaStatistics($mangaIds)['statistics'] ?? [])
+            : [];
+
+        $summaries = array_map(function ($rawManga) use ($stats) {
+            $id = $rawManga['id'] ?? '';
+            $extra = [];
+            if (isset($stats[$id])) {
+                $extra['statistics'] = $stats[$id];
+            }
+
+            return MangaSummary::fromMangaDexResponse($rawManga, $extra)->toArray();
+        }, $items);
+
+        return response()->json([
+            'data' => $summaries,
+        ]);
+    }
+
+    /**
+     * GET /api/manga/updates
+     * Query: type (project|mirror, required), page (default 1), per_page (default 30)
+     * Response: { "data": MangaSummary[], "meta": { "current_page": 1, "last_page": 3, "total": 90 } }
+     */
+    public function updates(UpdatesRequest $request): JsonResponse
+    {
+        $type = $request->validated('type');
+        $page = (int) $request->validated('page', 1);
+        $perPage = (int) $request->validated('per_page', 30);
+
+        // Fetch manga_id from scanlator_mappings filtered by group_type
+        $mangaIds = ScanlatorMapping::where('group_type', $type)
+            ->orderBy('priority', 'desc')
+            ->pluck('manga_id')
+            ->unique()
+            ->values()
+            ->all();
+
+        $total = count($mangaIds);
+        $lastPage = (int) max(1, ceil($total / $perPage));
+
+        if ($total === 0 || $page > $lastPage) {
+            return response()->json([
+                'data' => [],
+                'meta' => [
+                    'current_page' => $page,
+                    'last_page' => $lastPage,
+                    'total' => $total,
+                ],
+            ]);
+        }
+
+        $offset = ($page - 1) * $perPage;
+        $pageMangaIds = array_slice($mangaIds, $offset, $perPage);
+
+        $response = $this->mangaDex->searchManga([
+            'ids' => $pageMangaIds,
+            'limit' => count($pageMangaIds),
+            'includes' => ['cover_art', 'author', 'artist'],
+            'contentRating' => ['safe', 'suggestive'],
+        ]);
+
+        $items = $response['data'] ?? [];
+        $fetchedIds = array_column($items, 'id');
+
+        $stats = ! empty($fetchedIds)
+            ? ($this->mangaDex->getMangaStatistics($fetchedIds)['statistics'] ?? [])
+            : [];
+
+        $summaries = array_map(function ($rawManga) use ($stats) {
+            $id = $rawManga['id'] ?? '';
+            $extra = [];
+            if (isset($stats[$id])) {
+                $extra['statistics'] = $stats[$id];
+            }
+
+            return MangaSummary::fromMangaDexResponse($rawManga, $extra)->toArray();
+        }, $items);
+
+        return response()->json([
+            'data' => $summaries,
+            'meta' => [
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'total' => $total,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /api/manga/popular
+     * Query: period (daily|weekly|all, required), limit (default 5)
+     * Response: { "data": MangaSummary[] }
+     */
+    public function popular(PopularRequest $request): JsonResponse
+    {
+        $period = $request->validated('period');
+        $limit = (int) $request->validated('limit', 5);
+
+        $query = MangaView::query();
+        if ($period === 'daily') {
+            $query->where('viewed_at', '>=', Carbon::now()->subDay());
+        } elseif ($period === 'weekly') {
+            $query->where('viewed_at', '>=', Carbon::now()->subDays(7));
+        }
+
+        $popularViews = $query->select('manga_id', DB::raw('COUNT(*) as total_views'))
+            ->groupBy('manga_id')
+            ->orderByDesc('total_views')
+            ->limit($limit)
+            ->get();
+
+        if ($popularViews->isEmpty()) {
+            return response()->json([
+                'data' => [],
+            ]);
+        }
+
+        $mangaIds = $popularViews->pluck('manga_id')->all();
+        $viewCounts = $popularViews->pluck('total_views', 'manga_id')->all();
+
+        $response = $this->mangaDex->searchManga([
+            'ids' => $mangaIds,
+            'limit' => count($mangaIds),
+            'includes' => ['cover_art', 'author', 'artist'],
+            'contentRating' => ['safe', 'suggestive'],
+        ]);
+
+        $items = $response['data'] ?? [];
+        $itemsKeyed = [];
+        foreach ($items as $raw) {
+            if (isset($raw['id'])) {
+                $itemsKeyed[$raw['id']] = $raw;
+            }
+        }
+
+        $stats = ! empty($mangaIds)
+            ? ($this->mangaDex->getMangaStatistics($mangaIds)['statistics'] ?? [])
+            : [];
+
+        // Preserve ranking order from $popularViews
+        $summaries = [];
+        foreach ($mangaIds as $id) {
+            if (isset($itemsKeyed[$id])) {
+                $rawManga = $itemsKeyed[$id];
+                $extra = [
+                    'views' => $viewCounts[$id] ?? null,
+                ];
+                if (isset($stats[$id])) {
+                    $extra['statistics'] = $stats[$id];
+                }
+
+                $summaries[] = MangaSummary::fromMangaDexResponse($rawManga, $extra)->toArray();
+            }
+        }
+
+        return response()->json([
+            'data' => $summaries,
+        ]);
+    }
+}

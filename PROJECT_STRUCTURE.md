@@ -33,6 +33,12 @@ yang **sama persis** — kalau ditaruh di satu folder saja, gampang jadi tidak s
 ```
 backend/
 ├── app/
+│   ├── Filament/
+│   │   └── Resources/
+│   │       ├── BannerResource.php           # CRUD form untuk hero carousel
+│   │       ├── AnnouncementResource.php     # CRUD form untuk pengumuman
+│   │       └── ScanlatorMappingResource.php # CRUD form untuk mapping Project/Mirror
+│   │
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   └── Api/
@@ -177,3 +183,22 @@ tidak bingung mau taruh komponen baru di mana.
 5. `frontend/src/components/ui/` (primitives dulu)
 6. `frontend/src/components/comic/` (baru setelah primitives siap)
 7. `frontend/src/pages/Home.tsx` (rakit semua komponen jadi halaman)
+
+---
+
+## Admin Dashboard (Filament)
+
+Untuk mengelola data kurasi manual (`banners`, `announcements`,
+`scanlator_mappings`, dan `release_schedules`), Scrollify pakai **Filament**
+sebagai admin panel — bukan React custom, karena area ini cuma dipakai kamu
+sendiri (bukan user publik), jadi tidak perlu effort desain neobrutalism di sini.
+
+- **Lokasi:** tetap di dalam `backend/`, folder `app/Filament/Resources/`.
+- **Akses:** lewat browser di `http://localhost:8000/admin`, terpisah total dari
+  route `/api/*` yang dipakai frontend React — Filament render tampilannya
+  sendiri (server-rendered, mirip pola monolith), tidak lewat React sama sekali.
+- **Kenapa boleh begini padahal arsitektur kita "headless":** headless artinya
+  data komik (dari MangaDex) tidak dirender backend. Tapi data kurasi milik
+  Scrollify sendiri (banner, pengumuman) boleh punya UI pengelolaan di backend,
+  karena itu bukan konten yang dilihat pengguna akhir — cuma tools internal buat
+  kamu sebagai admin.
