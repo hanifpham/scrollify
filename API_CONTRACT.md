@@ -75,6 +75,20 @@ cookie-based auth lebih rapuh.
 
 ## 2. Manga (proxy MangaDex — hasil sudah dirapikan lewat DTO)
 
+**Catatan penting soal field `format`:** MangaDex TIDAK punya tag/kategori resmi
+untuk "Manga"/"Manhwa"/"Manhua" (tag grup "format" di MangaDex isinya hal lain
+seperti "Long Strip", "Full Color", "Web Comic", "Oneshot" — bukan pembeda
+negara asal). Pembeda yang benar adalah field `originalLanguage` di response
+manga:
+
+- `ja`, `ja-ro` → **manga**
+- `ko`, `ko-ro` → **manhwa**
+- `zh`, `zh-ro`, `zh-hk` → **manhua**
+- bahasa lain (misal `en` untuk originally-English) → fallback ke `"other"`
+
+Konversi ini dilakukan di DTO layer (`MangaSummary::fromMangaDexResponse()`),
+bukan lewat lookup tag.
+
 Semua endpoint di bawah ini backend yang panggil MangaDex, cache hasilnya
 (Redis, TTL disesuaikan per jenis data), lalu kembalikan dalam bentuk `MangaSummary`
 atau `MangaDetail` — **bukan** bentuk mentah MangaDex.
