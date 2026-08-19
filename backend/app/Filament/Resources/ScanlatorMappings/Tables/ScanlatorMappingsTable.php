@@ -6,6 +6,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class ScanlatorMappingsTable
@@ -43,8 +44,16 @@ class ScanlatorMappingsTable
             ])
             ->defaultSort('priority', 'desc')
             ->filters([
-                //
+                SelectFilter::make('group_type')
+                    ->label('Tipe Grup')
+                    ->options([
+                        'project' => 'Project',
+                        'mirror' => 'Mirror',
+                    ]),
             ])
+            ->emptyStateHeading('Belum ada pemetaan scanlator')
+            ->emptyStateDescription('Petakan manga ID dengan scanlation group ID MangaDex untuk prioritas rilis chapter.')
+            ->emptyStateIcon('heroicon-o-link')
             ->recordActions([
                 EditAction::make(),
             ])
