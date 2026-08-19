@@ -55,6 +55,21 @@ class MangaDexCacheService
     }
 
     /**
+     * Get single chapter by ID with cache.
+     *
+     * @param  string  $id
+     * @param  array  $includes
+     * @return array
+     */
+    public function getChapterById(string $id, array $includes = ['manga']): array
+    {
+        $cacheKey = 'mangadex:chapter:' . $id . ':' . md5(json_encode($includes));
+        $ttl = (int) config('mangadex.cache_ttl', 600);
+
+        return Cache::remember($cacheKey, $ttl, fn () => $this->client->getChapterById($id, $includes));
+    }
+
+    /**
      * Get chapter pages with cache.
      *
      * @param  string  $chapterId
@@ -63,7 +78,7 @@ class MangaDexCacheService
     public function getChapterPages(string $chapterId): array
     {
         $cacheKey = 'mangadex:chapter_pages:' . $chapterId;
-        $ttl = (int) config('mangadex.cache_ttl', 600);
+        $ttl = (int) config('mangadex.chapter_pages_ttl', 300);
 
         return Cache::remember($cacheKey, $ttl, fn () => $this->client->getChapterPages($chapterId));
     }

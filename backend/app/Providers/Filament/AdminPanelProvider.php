@@ -30,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('Scrollify Admin')
             ->brandLogo(asset('images/logo-scrollify.png'))
             ->brandLogoHeight('2.25rem')
-            ->favicon(asset('images/logo-scrollify.png'))
+            ->favicon(asset('images/favicon-scrollify.png'))
             ->colors([
                 'primary' => Color::hex('#6F39EE'),
                 'danger' => Color::hex('#b61722'),

@@ -52,6 +52,22 @@ class MangaDexClient
     }
 
     /**
+     * Get single chapter by ID with includes (e.g. manga).
+     *
+     * @param  string  $id Chapter UUID
+     * @param  array  $includes
+     * @return array Raw MangaDex API response
+     *
+     * @throws MangaDexApiException
+     */
+    public function getChapterById(string $id, array $includes = ['manga']): array
+    {
+        return $this->get("/chapter/{$id}", [
+            'includes' => $includes,
+        ]);
+    }
+
+    /**
      * Get chapter image pages from MangaDex @Home server and build full image URLs.
      *
      * @param  string  $chapterId Chapter UUID
