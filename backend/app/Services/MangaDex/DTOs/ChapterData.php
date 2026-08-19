@@ -26,6 +26,11 @@ class ChapterData implements Arrayable, JsonSerializable
      */
     public static function fromMangaDexResponse(array $rawChapter, array $pages = [], array $extra = []): self
     {
+        // Pastikan kita mengekstrak key 'pages' jika response utuh dari getChapterPages() yang dipassing.
+        if (isset($pages['pages']) && is_array($pages['pages'])) {
+            $pages = $pages['pages'];
+        }
+
         $id = $rawChapter['id'] ?? $extra['id'] ?? '';
         $attributes = $rawChapter['attributes'] ?? [];
 
