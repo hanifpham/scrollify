@@ -77,6 +77,14 @@ class MangaDexClient
      */
     public function getChapterPages(string $chapterId): array
     {
+        // Check chapter status first to avoid silent 404s for unavailable chapters
+        $chapterInfo = $this->getChapterById($chapterId);
+        $isUnavailable = $chapterInfo['data']['attributes']['isUnavailable'] ?? false;
+        
+        if ($isUnavailable) {
+            throw new \App\Exceptions\ChapterUnavailableException("Chapter ini tidak tersedia dari MangaDex (kemungkinan ditarik oleh penerbit resmi).");
+        }
+
         $response = $this->get("/at-home/server/{$chapterId}");
 
         $baseUrl = $response['baseUrl'] ?? '';

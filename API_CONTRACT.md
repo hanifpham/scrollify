@@ -166,6 +166,15 @@ Dipetakan ke section **Populer**. Backend agregasi dari tabel `manga_views`.
 }
 ```
 
+**Response 410 (Gone):** Dikembalikan jika chapter valid tetapi tidak tersedia di MangaDex (misal: ditarik penerbit resmi, atribut `isUnavailable: true` di MangaDex).
+
+```json
+{
+  "message": "Chapter ini tidak tersedia dari sumber.",
+  "reason": "source_unavailable"
+}
+```
+
 Dipakai halaman **Reader**.
 
 ---

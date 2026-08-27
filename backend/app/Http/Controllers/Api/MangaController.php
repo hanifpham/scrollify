@@ -308,6 +308,11 @@ class MangaController extends Controller
             try {
                 $pagesResponse = $this->mangaDex->getChapterPages($chapterId);
                 $pages = $pagesResponse['pages'] ?? [];
+            } catch (\App\Exceptions\ChapterUnavailableException $e) {
+                return response()->json([
+                    'message' => 'Chapter ini tidak tersedia dari sumber.',
+                    'reason' => 'source_unavailable'
+                ], 410);
             } catch (MangaDexApiException $e) {
                 if ($e->getStatusCode() === 404) {
                     $pages = [];
