@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { shadowBlock, shadowBlockHover } from '@/lib/design-tokens';
+import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary';
@@ -9,16 +8,24 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   children,
   className = '',
-  style,
+  disabled,
   ...props
 }) => {
-  const [isPressed, setIsPressed] = useState(false);
   const isPrimary = variant === 'primary';
   
+  const hoverClasses = disabled 
+    ? '' 
+    : 'hover:shadow-[5px_5px_0px_0px_#000000] hover:-translate-x-[2px] hover:-translate-y-[2px]';
+
+  const activeClasses = disabled
+    ? ''
+    : 'active:shadow-[1px_1px_0px_0px_#000000] active:translate-x-[2px] active:translate-y-[2px] active:scale-[0.98] active:duration-75';
+
   const baseClasses = `
-    inline-flex items-center justify-center font-bold rounded-sm transition-transform duration-75
+    inline-flex items-center justify-center font-bold rounded-sm transition-all duration-150
     disabled:opacity-50 disabled:cursor-not-allowed px-6 py-3
-    ${isPressed ? 'translate-x-[2px] translate-y-[2px]' : ''}
+    shadow-[3px_3px_0px_0px_#000000] translate-x-0 translate-y-0
+    ${hoverClasses} ${activeClasses}
   `;
   
   const variantClasses = isPrimary
@@ -28,15 +35,7 @@ export const Button: React.FC<ButtonProps> = ({
   return (
     <button
       className={`${baseClasses} ${variantClasses} ${className}`}
-      style={{
-        boxShadow: isPressed ? shadowBlockHover : shadowBlock,
-        ...style,
-      }}
-      onMouseDown={() => setIsPressed(true)}
-      onMouseUp={() => setIsPressed(false)}
-      onMouseLeave={() => setIsPressed(false)}
-      onTouchStart={() => setIsPressed(true)}
-      onTouchEnd={() => setIsPressed(false)}
+      disabled={disabled}
       {...props}
     >
       {children}
