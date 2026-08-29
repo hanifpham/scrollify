@@ -10,7 +10,7 @@ export const Tag: React.FC<TagProps> = ({
   className = '',
   ...props
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center border-border-black px-2 py-1 text-label-sm font-bold rounded-sm border-border-tag';
+  const baseClasses = 'inline-flex items-center justify-center border-border-black px-2 py-1 text-label-sm font-bold rounded-none border-border-tag shadow-[4px_4px_0px_0px_#000000]';
   
   let variantClasses = '';
   switch (variant) {

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Navbar, Footer, BottomNav } from '@/components/layout';
+import { Navbar, Footer, BottomNav, Container } from '@/components/layout';
 import Home from '@/pages/Home';
 import Explore from '@/pages/Explore';
 import Library from '@/pages/Library';
@@ -13,13 +13,15 @@ function App() {
         <Navbar />
         
         <main className="flex-1 pb-20 md:pb-0">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/dev/components" element={<ComponentsPreview />} />
-          </Routes>
+          <Container>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/library" element={<Library />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/dev/components" element={<ComponentsPreview />} />
+            </Routes>
+          </Container>
         </main>
         
         <Footer />

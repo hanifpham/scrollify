@@ -2,6 +2,7 @@
 
 @theme {
   --font-space-grotesk: "Space Grotesk", sans-serif;
+  --font-display: "Archivo Black", sans-serif;
 
   /* Colors */
   --color-surface: #fbf9f5;
@@ -24,7 +25,7 @@
   --color-primary-container: #9c48ea;
   --color-on-primary-container: #fffbff;
   --color-inverse-primary: #ddb7ff;
-  --color-secondary: #b61722;
+  --color-secondary: #EF4444;
   --color-on-secondary: #ffffff;
   --color-secondary-container: #da3437;
   --color-on-secondary-container: #fffbff;
@@ -32,7 +33,7 @@
   --color-on-tertiary: #ffffff;
   --color-tertiary-container: #00855b;
   --color-on-tertiary-container: #f5fff6;
-  --color-accent-amber: #F2B705;
+  --color-accent-amber: #FBBF24;
   --color-on-accent-amber: #1b1c1a;
   --color-amber-container: #FDE68A;
   --color-on-amber-container: #1b1c1a;
@@ -61,11 +62,11 @@
 
   /* Spacing */
   --spacing-border-thick: 4px;
-  --spacing-border-standard: 3px;
   --spacing-border-tag: 2px;
   --spacing-border-circular: 3px;
-  --spacing-shadow-offset: 5px;
-  --spacing-shadow-compact: 3px;
+  --spacing-shadow-badge: 4px;
+  --spacing-shadow-button: 4px;
+  --spacing-shadow-heavy: 10px;
   --spacing-gutter: 1.5rem;
   --spacing-margin-mobile: 1rem;
   --spacing-margin-desktop: 2.5rem;

@@ -21,7 +21,9 @@ colors:
   primary-container: "#9c48ea"
   on-primary-container: "#fffbff"
   inverse-primary: "#ddb7ff"
-  secondary: "#b61722"
+  # CORRECTED: nilai asli dari kode mockup adalah "danger": "#EF4444"
+  # (setara Tailwind red-500), bukan #b61722 seperti dugaan awal.
+  secondary: "#EF4444"
   on-secondary: "#ffffff"
   secondary-container: "#da3437"
   on-secondary-container: "#fffbff"
@@ -32,7 +34,8 @@ colors:
   # --- BARU: token amber/kuning (dipakai di header "Rekomendasi", bintang rating,
   # dan badge ranking Populer). Sebelumnya warna ini dipakai di UI tapi tidak
   # terdaftar sebagai token resmi.
-  accent-amber: "#F2B705"
+  # CORRECTED: kode mockup asli pakai Tailwind yellow-400 (#FBBF24), bukan #F2B705.
+  accent-amber: "#FBBF24"
   on-accent-amber: "#1b1c1a"
   amber-container: "#FDE68A"
   on-amber-container: "#1b1c1a"
@@ -59,21 +62,24 @@ colors:
   shadow-black: "#000000"
   pure-white: "#FFFFFF"
 typography:
+  # CORRECTED: kode mockup asli pakai "Archivo Black" khusus untuk headline
+  # besar (font-display class), BUKAN Space Grotesk. Space Grotesk tetap
+  # dipakai untuk body text dan label.
   display-lg:
-    fontFamily: Space Grotesk
+    fontFamily: Archivo Black
     fontSize: 48px
-    fontWeight: "700"
+    fontWeight: "900"
     lineHeight: "1.1"
     letterSpacing: -0.02em
   headline-lg:
-    fontFamily: Space Grotesk
+    fontFamily: Archivo Black
     fontSize: 32px
-    fontWeight: "700"
+    fontWeight: "900"
     lineHeight: "1.2"
   headline-md:
-    fontFamily: Space Grotesk
+    fontFamily: Archivo Black
     fontSize: 24px
-    fontWeight: "700"
+    fontWeight: "900"
     lineHeight: "1.2"
   body-lg:
     fontFamily: Space Grotesk
@@ -95,29 +101,30 @@ typography:
     fontSize: 12px
     fontWeight: "600"
     lineHeight: "1"
+# CORRECTED: kode mockup asli TIDAK memakai radius sama sekali di elemen
+# manapun (sudut tajam total), kecuali elemen circular murni (avatar).
+# Token rounded-sm/md/lg/xl DIHAPUS dari pemakaian; hanya "full" (lingkaran)
+# yang masih relevan.
 rounded:
-  sm: 0.125rem
-  DEFAULT: 0.25rem
-  md: 0.375rem
-  lg: 0.5rem
-  xl: 0.75rem
+  none: 0px
   full: 9999px
 spacing:
+  # CORRECTED: border width standard komponen besar (card, hero, section
+  # header, tombol) adalah 4px. border-width-standard (3px) sebelumnya
+  # tidak pernah benar-benar dipakai di kode asli, dihapus.
   border-width-thick: 4px
-  border-width-standard: 3px
-  # --- BARU: border width khusus tag/badge kecil (NEW, UP, PROJECT, MIRROR, ranking).
-  # Sebelumnya spec Tags menyebut "2px Black border" tapi tidak ada token untuk itu,
-  # jadi developer bisa salah pakai border-width-standard (3px).
   border-width-tag: 2px
-  # --- BARU: border untuk avatar/icon bulat, disebut di Shapes tapi belum ada angkanya.
   border-width-circular: 3px
-  shadow-offset: 5px
-  # --- BARU: shadow lebih tipis untuk card padat di grid Update (6 kolom desktop),
-  # supaya tidak terlalu berat dibanding card besar di Rekomendasi/Populer.
-  shadow-offset-compact: 3px
+  # CORRECTED: sistem shadow 3 tier, ganti total dari shadow-offset (5px)
+  # dan shadow-offset-compact (3px) yang merupakan dugaan awal yang salah.
+  shadow-offset-badge: 4px
+  shadow-offset-button: 4px
+  shadow-offset-heavy: 10px
   gutter: 1.5rem
   margin-mobile: 1rem
   margin-desktop: 2.5rem
+  container-max-width: 1440px
+  container-padding: 1.5rem
 ---
 
 ## Brand & Style
@@ -147,61 +154,68 @@ This design system uses **Space Grotesk** across all levels to maintain a cohesi
 - **Chunky Labels:** Small tags (like "NEW" or "Chapter #") use heavy weights and uppercase styling to ensure legibility against high-contrast backgrounds.
 - **Scaling:** On mobile devices, `display-lg` should scale down to `headline-lg` to maintain readability without overwhelming the screen.
 
-## Layout & Spacing
+## Layout & Spacing (CORRECTED — verified against actual mockup source)
 
-The layout follows a **Fixed Grid** philosophy on desktop to create a structured, "newspaper" comic feel.
-
-- **Desktop:** 12-column grid with 24px (1.5rem) gutters. Content is contained within a max-width container to prevent sprawling.
-- **Mobile:** Fluid single-column layout with 16px (1rem) side margins.
-- **Brutalist Spacing:** Elements do not use soft padding; spacing is rhythmic and calculated in 4px increments to align with border widths.
-- **Grid Reflow:**
-  - **Updates:** 6 columns on desktop, 3 on tablet, 2 on mobile.
-  - **Popular:** 8 narrow columns on desktop, 4 on tablet, 3 horizontal scroll on mobile.
+- **Container:** Every page wraps its content (navbar inner row, main
+  sections, footer inner content) in a single shared container:
+  `max-w-[1440px] mx-auto p-6`. This is non-negotiable — sections must not
+  invent their own width, or content sprawls edge-to-edge on wide screens.
+- **Mobile:** Same container, padding shrinks responsively; no separate
+  mobile-only margin system.
+- **Brutalist Spacing:** Elements do not use soft padding; spacing is
+  rhythmic and calculated in 4px increments to align with border widths.
+- **Grid Reflow (exact values from source):**
+  - **Rekomendasi:** `grid-cols-2` mobile → `md:grid-cols-3` tablet →
+    `lg:grid-cols-5` desktop, `gap-8`. Responsive GRID at every breakpoint —
+    NOT horizontal scroll on mobile.
+  - **Update:** `grid-cols-2` mobile → `md:grid-cols-4` tablet →
+    `lg:grid-cols-6` desktop, `gap-8`.
+  - **Populer:** Always horizontal scroll (`flex overflow-x-auto`) at every
+    breakpoint. Fixed card width `w-56` (14rem). Numbered rank badge
+    overlaps the top-left corner of the cover (`-top-2 -left-2` offset).
 
 ## Elevation & Depth
 
-Depth is conveyed through **Hard Solid Shadows** (Block Shadows) rather than light-source simulation.
+Depth is conveyed through **Hard Solid Shadows** (Block Shadows) rather than light-source simulation. See "Shadow Tiers" below for exact per-element values — there are three tiers (Badge 4px, Button 4px, Card/Heavy 10px), not a flat 5px/3px system.
 
-- **Block Shadows:** Large cards and buttons (Recommendation cards, Popular cards, primary buttons) use `shadow-offset` → `5px 5px 0px 0px #000000`.
-- **Compact Block Shadows:** Dense grid cards (Update section, 6-column desktop grid) use `shadow-offset-compact` → `3px 3px 0px 0px #000000`. This keeps tightly packed cards from visually competing with the heavier shadows on hero/featured content.
 - **No Blurs:** Gaussian blurs are strictly prohibited.
-- **No Gradients (default):** Flat fills only, everywhere, by default — gradients break the flat "cut-out sticker" read that block shadows depend on.
-  - **Exception — Popular ranking cards only:** the top-5 ranking cards in "Populer" may use a two-stop flat-toned gradient overlay behind the rank number, to visually differentiate the ranking module from standard comic cards. This is the _only_ place gradients are permitted. Any other section using a gradient is a design bug, not a style choice.
-- **Active State Elevation:** On hover or click, the shadow offset may decrease to `2px 2px`, simulating the element being physically pressed into the page. For compact cards, this reduces further to `1px 1px`.
+- **No Gradients:** Flat fills only, everywhere — gradients break the flat "cut-out sticker" read that block shadows depend on. No exceptions verified in source; the Populer ranking cards use flat solid rank-number badges (white/yellow-400/orange-400), not gradients.
+- **Active State Elevation:** On hover, shadow offset increases slightly with a small negative translate (lift effect). On active/press, offset reduces to roughly half its resting value with a positive translate (pressed-in effect). Apply per the element's own tier (a Badge presses from 4px→2px, a Card presses from 10px→6px), not a single global value.
 
 ## Shapes
 
-The shape language is "Softly Sharp." While the design is aggressive, a subtle radius of **4px (0.25rem)** on borders prevents the UI from feeling dangerously sharp, providing just enough friendliness for a consumer app.
+**CORRECTED (verified against actual mockup source code):** the shape language is fully sharp, NOT "softly sharp." There is NO border-radius anywhere in the reference implementation — buttons, cards, tags, inputs all have hard 90° corners. This is intentional and central to the raw, sticker-cut-out aesthetic.
 
-- **Standard Elements:** Buttons, cards, and input fields use `rounded-sm`.
-- **Large Containers:** Hero banners and section wrappers use `rounded-md`.
-- **Circular Elements:** Avatars and icon-only buttons remain fully circular, and use `border-width-circular` (3px) black border — thinner than standard cards since circular shapes read as "heavier" at the same border weight due to their continuous outline.
+- **All Elements:** Buttons, cards, tags, input fields, section headers — `rounded-none` (radius 0) across the board. Do not apply `rounded-sm` or any radius utility.
+- **Circular Elements:** Avatars remain fully circular (`rounded-full` is the one exception, for literal circles only, e.g. avatar), with `border-width-circular` (3px) black border.
 
-## Components
+## Components (CORRECTED — verified against actual mockup source)
 
 ### Buttons
 
-- **Primary:** Bright Purple (`primary`) background, `border-width-thick` (4px) Black border, `shadow-offset` (5px) Hard Black shadow, Bold White (`on-primary`) text.
-- **Secondary:** Stark White (`pure-white`) background, `border-width-standard` (3px) Black border, `shadow-offset` (5px) Hard Black shadow.
-- **Hover State:** Translate element `-2px -2px` and increase shadow, or translate `+2px +2px` and remove shadow for a "pressed" effect.
+- **Primary:** Bright Purple (`primary`) background, `border-width-thick` (4px) Black border, Button-tier shadow (4px), Bold White (`on-primary`) text, uppercase.
+- **Secondary:** Stark White (`pure-white`) background, `border-width-thick` (4px) Black border, Button-tier shadow (4px).
+- **No radius** on any button.
+- **Hover/Active:** see Elevation & Depth active state rules, Button tier.
 
-### Cards (Comic & Update)
+### Cards
 
-- **Background:** Pure White (`pure-white`).
-- **Standard cards (Rekomendasi, Populer):** `border-width-standard` (3px) or `border-width-thick` (4px) Solid Black border, `shadow-offset` (5px) Black Block Shadow.
-- **Compact cards (Update grid):** `border-width-standard` (3px) Solid Black border, `shadow-offset-compact` (3px) Black Block Shadow — see Elevation & Depth.
-- **Internal Structure:** Thumbnails should be flush to the top or have a consistent 8px internal margin. Meta-info (Chapter lists) should be contained in their own sub-bordered boxes.
+- **Background:** Pure White (`pure-white`), **no radius**.
+- **ComicCard (Rekomendasi/Update/Populer covers):** `border-width-thick` (4px) Solid Black border, Card/Heavy-tier shadow (10px). Cover image `aspect-[3/4]`, `object-cover`, flush to the card edges (no internal padding around the image) with `border-b-4 border-black` separating image from text below.
+- **Title area under cover:** fixed-height wrapper so 1-line and 2-line titles produce identically-tall cards in a row — use `h-12` (3rem) with `line-clamp-2`, OR `line-clamp-1` centered (Rekomendasi style: centered, uppercase, single line) vs left-aligned with an "UP" prefix tag (Update style: left-aligned, two lines, `h-12` fixed).
+- **Hero/Announcement panel:** same Card/Heavy tier (10px shadow, 4px border).
 
-### Tags (NEW / UP / Genre / Ranking)
+### Tags & Badges
 
-- **NEW/UP:** Bright Red (`secondary`) background, `border-width-tag` (2px) Black border, White (`on-secondary`) Bold text.
-- **Genre/Status:** Purple (`primary`) or Green (`tertiary`) backgrounds, `border-width-tag` (2px) Black border.
-- **Rating/Star indicator:** Amber (`accent-amber`) fill, `border-width-tag` (2px) Black border, near-black (`on-accent-amber`) text — never white text on amber, contrast ratio fails.
-- **Positioning:** Absolute positioning on the top-left or top-right of comic covers.
+- **Badge tier** (2px border, 4px shadow): rating star badge, views-count badge, format badge (MANGA/MANHWA/MANHUA), NEW/UP tag, relative-time badge, language flag badge.
+- **NEW/UP:** Bright Red (`secondary` = `#EF4444`) background, White (`on-secondary`) Bold text, uppercase.
+- **Rating/Star indicator:** Amber (`accent-amber` = `#FBBF24`) fill, near-black (`on-accent-amber`) text — never white text on amber, contrast ratio fails.
+- **Positioning:** Absolute positioning on the top-left or top-right of comic covers; multiple badges on the same corner stack vertically with a small gap, never overlapping.
+- **No radius** on any tag/badge.
 
 ### Input Fields
 
-- Stark White background, `border-width-standard` (3px) Black border.
+- Stark White background, `border-width-thick` (4px) Black border, **no radius**.
 - Focus state: Change border to Primary Purple or increase border thickness.
 - Placeholder text: Mid-gray (`on-surface-variant`), using the `label-lg` font style.
 
