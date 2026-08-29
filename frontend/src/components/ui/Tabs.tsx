@@ -21,10 +21,10 @@ export function Tabs({ options, value, onChange, className = '' }: TabsProps) {
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
-            className={`whitespace-nowrap px-6 py-2 rounded-full border-2 font-bold text-sm uppercase transition-colors duration-200 ${
+            className={`whitespace-nowrap px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_#000000] font-black text-lg uppercase transition-colors duration-200 rounded-none ${
               isActive
-                ? "bg-primary border-black text-white"
-                : "bg-white border-black text-black hover:bg-gray-100"
+                ? "bg-primary text-on-primary"
+                : "bg-pure-white text-on-surface hover:bg-zinc-200"
             }`}
           >
             {option.label}

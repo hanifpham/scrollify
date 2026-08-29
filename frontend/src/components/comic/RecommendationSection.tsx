@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Sparkles } from 'lucide-react';
 import { SectionHeader } from '../layout';
 import { ComicCard } from './ComicCard';
 import { Tabs, Button, Card } from '../ui';
@@ -39,7 +40,7 @@ export function RecommendationSection() {
 
   return (
     <section className="mb-12">
-      <SectionHeader title="REKOMENDASI" variant="amber" />
+      <SectionHeader title="REKOMENDASI" variant="amber" icon={Sparkles} />
       
       <div className="mb-6 mt-4">
         <Tabs
@@ -57,10 +58,12 @@ export function RecommendationSection() {
       ) : isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-stretch">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="w-full animate-pulse flex flex-col gap-2">
-              <div className="w-full aspect-3/4 bg-gray-200 border-border-thick border-black rounded-none shadow-[10px_10px_0px_0px_#000000]" />
-              <div className="h-6 bg-gray-200 w-3/4 rounded-none border-border-thick border-black" />
-              <div className="h-4 bg-gray-200 w-1/2 rounded-none border-border-thick border-black" />
+            <div key={i} className="w-full animate-pulse flex flex-col space-y-4">
+              <div className="w-full aspect-3/4 bg-zinc-200 border-border-thick border-black shadow-[10px_10px_0px_0px_#000000]" />
+              <div className="space-y-1 flex-1 flex flex-col justify-between">
+                <div className="h-6 bg-zinc-200 w-3/4 mx-auto" />
+                <div className="h-4 bg-zinc-200 w-1/2 mx-auto" />
+              </div>
             </div>
           ))}
         </div>

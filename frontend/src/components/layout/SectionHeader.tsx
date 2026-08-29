@@ -22,14 +22,14 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   return (
     <div
       className={`
-        inline-flex items-center gap-2 px-4 py-2 
-        border-border-standard border-border-black shadow-[3px_3px_0px_0px_#000000]
-        uppercase font-bold text-headline-md rounded-sm
+        flex items-center gap-4 p-6 
+        border-4 border-black shadow-[10px_10px_0px_0px_#000000] w-max
+        uppercase text-5xl font-display tracking-tight
         ${variantStyles[variant]}
         ${className}
       `}
     >
-      {Icon && <Icon size={24} strokeWidth={2.5} />}
+      {Icon && <Icon size={48} strokeWidth={2.5} />}
       <span>{title}</span>
     </div>
   );
