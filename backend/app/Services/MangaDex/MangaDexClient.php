@@ -172,6 +172,7 @@ class MangaDexClient
         try {
             $response = Http::baseUrl($baseUrl)
                 ->timeout($timeout)
+                ->withoutVerifying()
                 ->withHeaders([
                     'User-Agent' => 'Scrollify/1.0 (https://github.com/hanifpham/scrollify)',
                     'Accept' => 'application/json',

@@ -23,9 +23,10 @@ export function RecommendationSection() {
   const fetchRecommendations = async () => {
     setIsLoading(true);
     setError(null);
+    console.log("Fetching recommendations for format:", activeFormat);
     try {
-      const recommendations = await getRecommendations(activeFormat, 5); // Desktop shows 5 columns, fetch 5 items
-      setData(recommendations);
+      const recommendations = await getRecommendations(activeFormat, 5);
+      setData(recommendations || []);
     } catch (err: any) {
       console.error('Error fetching recommendations:', err);
       setError('Gagal memuat rekomendasi');
@@ -67,7 +68,7 @@ export function RecommendationSection() {
             </div>
           ))}
         </div>
-      ) : data.length === 0 ? (
+      ) : !data || data.length === 0 ? (
         <div className="py-10 text-center border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <p className="text-lg font-bold text-gray-500">Belum ada rekomendasi untuk kategori ini</p>
         </div>
